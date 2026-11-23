@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark" data-accent="violet">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; connect-src 'self' https://api.github.com; img-src 'self' guide: media: data:; media-src 'self' media:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self' data:;" />
+  <title>云小抄 PC</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <link rel="stylesheet" href="main.css" />
+</head>
+<body>
+  <svg class="sprite" aria-hidden="true">
+    <defs>
+      <symbol id="i-guide" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 18.5A2.5 2.5 0 0 1 6.5 16H20"/><path d="M8 7h8M8 10.5h5"/></symbol>
+      <symbol id="i-cross" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.2"/><path d="M12 2.4v4.2M12 17.4v4.2M2.4 12h4.2M17.4 12h4.2"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></symbol>
+      <symbol id="i-look" viewBox="0 0 24 24"><path d="M12 3.2c4.6 0 8.2 3.2 9.6 7.1.2.5.2 1 0 1.5-1.4 3.9-5 7.1-9.6 7.1s-8.2-3.2-9.6-7.1a1.8 1.8 0 0 1 0-1.5C3.8 6.4 7.4 3.2 12 3.2Z"/><circle cx="12" cy="11" r="3.1"/><path d="M4 20.5 20.5 4"/></symbol>
+      <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 3v11.5"/><path d="m7.4 10.4 4.6 4.6 4.6-4.6"/><path d="M4 19.5h16"/></symbol>
+      <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7.4 18a4.1 4.1 0 0 1-.5-8.2 5.5 5.5 0 0 1 10.6-1.2 3.9 3.9 0 0 1 .6 7.7"/><path d="M12 10.5V19"/><path d="m8.9 15.9 3.1 3.1 3.1-3.1"/></symbol>
+      <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="7.8" r="1" fill="currentColor" stroke="none"/></symbol>
+      <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3.5 6.8A2 2 0 0 1 5.5 4.8h4l2 2.4h7a2 2 0 0 1 2 2v8.2a2 2 0 0 1-2 2H5.5a2 2 0 0 1-2-2z"/></symbol>
+      <symbol id="i-image" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2.4"/><circle cx="8.6" cy="9.6" r="1.6"/><path d="m4.5 17.5 4.6-4.4 3.2 3 2.6-2.3 4.6 4.2"/></symbol>
+      <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11.5a8 8 0 1 0-1.9 6.2"/><path d="M20 4.8v6.7h-6.7"/></symbol>
+      <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10" width="15" height="10.5" rx="2.4"/><path d="M8 10V7.6a4 4 0 0 1 8 0V10"/></symbol>
+      <symbol id="i-unlock" viewBox="0 0 24 24"><rect x="4.5" y="10" width="15" height="10.5" rx="2.4"/><path d="M8 10V7.6a4 4 0 0 1 7.4-2"/></symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+      <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5 19 12 8 18.5z"/></symbol>
+      <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l2.6-2.6a4.5 4.5 0 0 0-6.4-6.4L11.4 6"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0L5 12.6a4.5 4.5 0 0 0 6.4 6.4L12.6 18"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+      <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.5 6.5h15M9 6.5V4.8h6v1.7M7 6.5l.8 12.2a1.6 1.6 0 0 0 1.6 1.5h5.2a1.6 1.6 0 0 0 1.6-1.5L17 6.5"/></symbol>
+      <symbol id="i-move" viewBox="0 0 24 24"><path d="M12 3v18M3 12h18"/><path d="m9 6 3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3"/></symbol>
+    </defs>
+  </svg>
+
+  <div class="app">
+    <aside class="rail">
+      <div class="brand">
+        <img src="../../../assets/icon.png" alt="" />
+        <div class="brand-text"><b>云小抄</b><span>PC · 移植版</span></div>
+      </div>
+
+      <nav class="nav">
+        <button class="nav-item active" data-tab="guide"><svg><use href="#i-guide"/></svg><span>小抄</span></button>
+        <button class="nav-item" data-tab="crosshair"><svg><use href="#i-cross"/></svg><span>准星</span></button>
+        <button class="nav-item" data-tab="pan"><svg><use href="#i-cloud"/></svg><span>网盘</span></button>
+        <button class="nav-item" data-tab="look"><svg><use href="#i-look"/></svg><span>外观</span></button>
+        <button class="nav-item" data-tab="download"><svg><use href="#i-down"/></svg><span>云析 PC</span></button>
+        <button class="nav-item" data-tab="about"><svg><use href="#i-info"/></svg><span>关于</span></button>
+      </nav>
+
+      <div class="rail-foot">
+        <div class="rail-status" id="railStatus"><i></i><span>未运行</span></div>
+        <button class="rail-quit" id="btnQuit">退出</button>
+      </div>
+    </aside>
+
+    <section class="stage">
+      <header class="topbar" id="topbar">
+        <div class="topbar-text">
+          <h1 id="pageTitle">小抄</h1>
+          <p id="pageSub">攻略悬浮窗 · 图片来源 · 小抄外观</p>
+        </div>
+        <div class="topbar-right">
+          <div class="pill" id="pillGuide"><i></i>悬浮窗</div>
+          <div class="pill" id="pillCross"><i></i>准星</div>
+          <div class="winbtns">
+            <button id="btnMin" title="最小化"><svg viewBox="0 0 12 12"><path d="M2 6h8"/></svg></button>
+            <button id="btnMax" title="最大化"><svg viewBox="0 0 12 12"><rect x="2.2" y="2.2" width="7.6" height="7.6" rx="1"/></svg></button>
+            <button id="btnClose" class="danger" title="收到托盘"><svg viewBox="0 0 12 12"><path d="m2.4 2.4 7.2 7.2M9.6 2.4 2.4 9.6"/></svg></button>
+          </div>
+        </div>
+      </header>
+
+      <main class="content" id="content">
+        <!-- ============ 小抄 ============ -->
+        <section class="page active" data-page="guide">
+          <div class="hero module">
+            <div class="hero-main">
+              <div class="hero-kicker">GUIDE OVERLAY</div>
+              <h2>把攻略钉在游戏旁边</h2>
+              <p>透明、置顶、可穿透。图片放在一个文件夹里就行，分类和翻页都自动认。</p>
+            </div>
+            <div class="hero-side">
+              <button class="btn primary big" id="btnGuideToggle">开 启 小 抄</button>
+              <div class="hint" id="guideStateText">当前未运行</div>
+            </div>
+          </div>
+
+          <div class="card module">
+            <div class="card-head">
+              <div><h3>攻略文件夹</h3><p>手机上的「本地小抄」直接把整个文件夹拷过来</p></div>
+              <div class="head-actions">
+                <button class="btn ghost" id="btnGuideOpen">打开目录</button>
+                <button class="btn" id="btnGuidePick">选择文件夹</button>
+              </div>
+            </div>
+            <div class="folder-box" id="folderBox">
+              <svg><use href="#i-folder"/></svg>
+              <div class="folder-info">
+                <b id="folderName">还没选文件夹</b>
+                <span id="folderPath">选一个装着分类子文件夹或图片的目录</span>
+              </div>
+              <div class="folder-stat" id="folderStat"></div>
+            </div>
+            <div class="chips-row" id="topFolders"></div>
+          </div>
+
+          <!-- 一键下载 -->
+          <div class="card module" id="dlCard">
+            <div class="card-head">
+              <div><h3>网盘一键下载</h3><p>整份小抄落到本地，之后秒开，不联网也能看</p></div>
+              <div class="head-actions">
+                <button class="btn ghost" id="btnDlOpenBase">打开下载目录</button>
+              </div>
+            </div>
+
+            <div class="dl-row">
+              <button class="btn" id="btnDlShare"><svg><use href="#i-link"/></svg>从分享链接下载</button>
+              <button class="btn" id="btnDlCloud"><svg><use href="#i-cloud"/></svg>从我的网盘下载</button>
+            </div>
+            <div class="dl-dest">保存到 <b id="dlDest">—</b></div>
+
+            <div class="dl-progress" id="dlProgress" hidden>
+              <div class="dl-bar"><i id="dlBar"></i></div>
+              <div class="dl-line">
+                <b id="dlCount">0 / 0</b>
+                <span id="dlPct">0%</span>
+              </div>
+              <div class="dl-current" id="dlCurrent"></div>
+              <div class="dl-actions"><button class="btn ghost sm" id="btnDlCancel">取消</button></div>
+            </div>
+
+            <div class="dl-done" id="dlDone" hidden>
+              <div class="dl-done-head"><svg><use href="#i-check"/></svg><b id="dlDoneTitle"></b></div>
+              <div class="dl-path" id="dlDonePath"></div>
+              <div class="row-actions">
+                <button class="btn" id="btnDlOpen">打开文件夹</button>
+                <button class="btn primary" id="btnDlUse">设为本地小抄</button>
+              </div>
+            </div>
+            <div class="dl-error" id="dlError" hidden></div>
+
+            <p class="fine">夸克 / UC 分享直接粘贴整段文案；登录网盘后能整目录下，不受游客单文件 50MB 限制。重复下载只补新图。</p>
+          </div>
+
+          <div class="grid2">
+            <div class="card module">
+              <div class="card-head"><div><h3>窗口</h3><p>改完立刻生效</p></div></div>
+              <label class="row"><span>不透明度</span><b id="alphaVal">100%</b></label>
+              <input type="range" id="alphaRange" min="20" max="100" value="100" />
+              <label class="row"><span>窗口宽度</span><b id="widthVal">400 px</b></label>
+              <input type="range" id="widthRange" min="300" max="820" value="400" />
+              <div class="switch-row">
+                <div><b>锁定穿透</b><span>锁上之后鼠标直接穿过去，不会挡住游戏</span></div>
+                <button class="switch" id="switchGuideLock" role="switch"></button>
+              </div>
+              <div class="switch-row">
+                <div><b>游戏模式 · 始终置顶</b><span>窗口一直压在游戏上面，不会被别的窗口盖住</span></div>
+                <button class="switch" id="switchGuideTop" role="switch"></button>
+              </div>
+              <p class="fine" id="guideDiag">正在读取窗口状态…</p>
+              <div class="dm-row">
+                <i class="dm-dot" id="dmDot"></i>
+                <span id="dmText">正在检测显示模式…</span>
+                <button class="linkbtn" id="btnDmCheck">重新检测</button>
+              </div>
+              <p class="fine" id="dmHint" style="display:none"></p>
+              <p class="fine">小抄点不动时按 <b>Alt + Shift + R</b> 强制重置（或右键托盘图标 →「小抄点不动？重置悬浮窗」）。</p>
+            </div>
+
+            <div class="card module">
+              <div class="card-head"><div><h3>快捷键</h3><p>游戏里不用切出来</p></div></div>
+              <div class="hotkey-list" id="hotkeyList"></div>
+              <p class="fine">点一下按键栏，按下新的组合键即可改绑；Esc 取消。被别的软件占用时会标红。</p>
+            </div>
+          </div>
+
+          <div class="grid2">
+            <div class="card module">
+              <div class="card-head">
+                <div><h3>悬浮球</h3><p>一个球绑一个分类，点一下直接翻到第一张</p></div>
+                <button class="btn sm" id="btnOrbAdd">加一个</button>
+              </div>
+              <div class="orb-list" id="orbList"></div>
+              <p class="fine">右键球 →「换绑到」可以随时改目标文件夹；Alt+滚轮改大小。最多 3 个，每个都是独立透明窗口，再多会掉帧。</p>
+            </div>
+
+            <div class="card module">
+              <div class="card-head"><div><h3>操作教程</h3><p>三分钟上手，不用翻文档</p></div></div>
+              <div class="tut">
+                <details open>
+                  <summary>① 换下载路径</summary>
+                  <p>「下载」页 → 保存位置右边的「更改目录」→ 选一个盘（比如 <code>D:\小抄</code>）。</p>
+                  <p>网盘下载会在这个目录下再建一层 <code>夸克网盘\</code>，里面的层级和网盘里完全一样，你在网盘里怎么分类，本地就怎么分类。</p>
+                </details>
+                <details>
+                  <summary>② 右键换绑悬浮球</summary>
+                  <p><b>右键</b>桌面上的球 → 展开「换绑到」→ 点一个分类（比如把「龙宫」改成「虫谷」）。</p>
+                  <p>当前绑的那个会打勾。换完立刻生效，球上的封面也会跟着变。</p>
+                </details>
+                <details>
+                  <summary>③ 快捷键显隐</summary>
+                  <p><b>热键 A（默认 Alt+X）</b>：小抄大图 显 / 隐。按一下弹出来，再按一下收回去。</p>
+                  <p><b>热键 B（默认 Alt+Z）</b>：只控制悬浮球。全屏打游戏时按一下，屏幕上立刻干干净净。</p>
+                  <p>键位可以在上面的「快捷键」卡片里改：点一下按键栏，按下新组合键即可。被别的软件占用时会标红，换一个就好。</p>
+                </details>
+                <details>
+                  <summary>④ 调透明度和大小</summary>
+                  <p>小抄窗口上：<code>Alt + 滚轮</code> 调透明度，<code>Ctrl + 滚轮</code> 调窗口大小。</p>
+                  <p>也可以拖上面的两个滑杆，效果一样。</p>
+                </details>
+                <details>
+                  <summary>⑤ 翻页 & 临时穿透</summary>
+                  <p>大图打开后，<b>滚轮</b>或 <b>← →</b> 翻上/下一张，<code>Esc</code> 关闭。</p>
+                  <p>鼠标离开窗口约 2.6 秒会自动回到「穿透」状态，不会挡住游戏点击；把鼠标移回窗口上会立刻恢复可操作。</p>
+                  <p>想一直锁死穿透，就打开「锁定穿透」开关。</p>
+                </details>
+                <details>
+                  <summary>⑥ 整目录下载（龙宫 / 虫谷这种）</summary>
+                  <p>「网盘」页左侧目录树里，每个文件夹名字左边有一个<b>小方框</b> —— 点它就是「整个文件夹一起下」，不用一个个勾。</p>
+                  <p>也可以进到目录里单独勾几张，再切到别的目录接着勾，底部会统计「已选 N 个文件 + M 个整文件夹」。</p>
+                  <p>点「开始下载」会先预检：要下几个、跳过几个、共多少 MB，确认了才真下。</p>
+                </details>
+              </div>
+            </div>
+          </div>
+
+          <div class="card module note">
+            <div class="note-icon">!</div>
+            <div>
+              <b>游戏要设成「无边框窗口」或「窗口化」</b>
+              <p>独占全屏会把所有叠加层挡在下面 —— 这是系统层面的限制，任何准星 / 悬浮窗工具都一样。</p>
+              <p style="margin-top:6px">如果游戏是「以管理员身份运行」的，本程序也要右键 → 以管理员身份运行，否则 Windows 不允许低权限窗口盖在它上面。</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ 准星 ============ -->
+        <section class="page" data-page="crosshair">
+          <div class="hero module">
+            <div class="hero-main">
+              <div class="hero-kicker">CROSSHAIR</div>
+              <h2>自己导图，自己定瞄准点</h2>
+              <p>一张图 + 一个点。想换枪就新建一套，快捷键直接轮换。</p>
+            </div>
+            <div class="hero-side">
+              <button class="btn primary big" id="btnCrossToggle">开 启 准 星</button>
+              <div class="hint" id="crossStateText">当前未运行</div>
+            </div>
+          </div>
+
+          <div class="card module">
+            <div class="card-head">
+              <div><h3>我的准星</h3><p>最多 24 套，点一下切换；右键改名或删除</p></div>
+              <button class="btn ghost" id="btnCrossNew"><svg><use href="#i-plus"/></svg>新建</button>
+            </div>
+            <div class="profile-strip" id="profileStrip"></div>
+          </div>
+
+          <div class="grid2 cross-grid">
+            <div class="card module">
+              <div class="card-head"><div><h3>瞄准点</h3><p>点图片上的任意位置，那一点就是准心</p></div></div>
+              <div class="preview-wrap" id="previewWrap">
+                <img id="previewImg" alt="" />
+                <div class="preview-empty" id="previewEmpty">
+                  <svg><use href="#i-image"/></svg>
+                  <span>还没导入图片</span>
+                </div>
+                <div class="anchor-dot" id="anchorDot"></div>
+              </div>
+              <div class="row-actions">
+                <button class="btn" id="btnPickImage">导入图片</button>
+                <button class="btn ghost" id="btnClearImage">清除</button>
+              </div>
+            </div>
+
+            <div class="card module">
+              <div class="card-head"><div><h3>外观与位置</h3><p>窗口跟着锚点走，改大小不会跑位</p></div></div>
+              <label class="row"><span>显示宽度</span><b id="crossWidthVal">220 px</b></label>
+              <input type="range" id="crossWidth" min="32" max="720" value="220" />
+              <label class="row"><span>不透明度</span><b id="crossAlphaVal">100%</b></label>
+              <input type="range" id="crossAlpha" min="15" max="100" value="100" />
+              <div class="switch-row">
+                <div><b>画十字线</b><span>纯色图 / 半透明图案建议开着</span></div>
+                <button class="switch" id="switchLines" role="switch"></button>
+              </div>
+              <div class="row-actions">
+                <button class="btn" id="btnAdjust"><svg><use href="#i-move"/></svg>调整位置</button>
+                <button class="btn ghost" id="btnCenter">一键居中</button>
+              </div>
+              <p class="fine" id="adjustHint">「调整位置」会临时取消穿透，直接拖动准星即可；再点一次收工。</p>
+            </div>
+          </div>
+
+          <div class="card module note">
+            <div class="note-icon">!</div>
+            <div>
+              <b>准星是全屏叠加层，不是注入</b>
+              <p>它不读游戏内存、不改游戏文件，只是一张透明置顶的图。竞技游戏可能判定违规，自己判断要不要用。</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ 外观 ============ -->
+        <section class="page" data-page="look">
+          <div class="hero module">
+            <div class="hero-main">
+              <div class="hero-kicker">MOTION &amp; SPLASH</div>
+              <h2>碎格、浮现，随你挑</h2>
+              <p>入口用碎格、切页用浮现，两套可以混着来。开屏图片和视频都能换。</p>
+            </div>
+            <div class="hero-side">
+              <button class="btn primary big" id="btnReplay">重 播 入 场</button>
+              <div class="hint">按当前设置立刻走一遍</div>
+            </div>
+          </div>
+
+          <div class="card module">
+            <div class="card-head">
+              <div><h3>动画</h3><p>关掉就是直接出现，不耽误事</p></div>
+              <button class="switch" id="switchMotion" role="switch"></button>
+            </div>
+            <div class="seg-group">
+              <div class="seg-block">
+                <label>入场（点开程序那一下）</label>
+                <div class="seg" id="segEntrance">
+                  <button data-v="0">碎格</button>
+                  <button data-v="1">浮现</button>
+                </div>
+              </div>
+              <div class="seg-block">
+                <label>切页（页签之间）</label>
+                <div class="seg" id="segSwitch">
+                  <button data-v="0">碎块</button>
+                  <button data-v="1">浮现</button>
+                </div>
+              </div>
+              <div class="seg-block">
+                <label>速度</label>
+                <div class="seg" id="segSpeed">
+                  <button data-v="0">慢</button>
+                  <button data-v="1">标准</button>
+                  <button data-v="2">快</button>
+                  <button data-v="3">极快</button>
+                </div>
+              </div>
+            </div>
+            <div class="motion-demo" id="motionDemo">
+              <div class="demo-tile"></div><div class="demo-tile"></div><div class="demo-tile"></div>
+              <div class="demo-tile"></div><div class="demo-tile"></div><div class="demo-tile"></div>
+            </div>
+          </div>
+
+          <div class="card module">
+            <div class="card-head">
+              <div><h3>开屏动画</h3><p>启动时盖在主界面上，点一下就跳过</p></div>
+              <button class="switch" id="switchSplash" role="switch"></button>
+            </div>
+            <div class="splash-row">
+              <div class="splash-thumb" id="splashThumb"><span>内置</span></div>
+              <div class="splash-info">
+                <b id="splashName">内置开屏（图标 + 名字）</b>
+                <span id="splashMeta">图片停留 1.8 秒 · 视频最长 15 秒</span>
+              </div>
+              <div class="head-actions">
+                <button class="btn ghost" id="btnSplashImage">选图片</button>
+                <button class="btn ghost" id="btnSplashVideo">选视频</button>
+                <button class="btn ghost" id="btnSplashClear">用内置</button>
+              </div>
+            </div>
+            <div class="seg-block inline">
+              <label>图片停留</label>
+              <div class="seg" id="segHold">
+                <button data-v="0">1 秒</button>
+                <button data-v="1">1.8 秒</button>
+                <button data-v="2">3 秒</button>
+              </div>
+            </div>
+            <p class="fine">视频超过 15 秒只播前 15 秒；开屏视频默认静音，避免突然炸耳朵。</p>
+          </div>
+
+          <div class="grid2">
+            <div class="card module">
+              <div class="card-head"><div><h3>主题</h3><p>浅色适合白天，深色贴着游戏</p></div></div>
+              <div class="seg" id="segTheme">
+                <button data-v="dark">深色</button>
+                <button data-v="light">浅色</button>
+              </div>
+              <div class="accent-row" id="accentRow"></div>
+            </div>
+            <div class="card module">
+              <div class="card-head"><div><h3>数据</h3><p>配置都在一个 json 里</p></div></div>
+              <button class="btn ghost wide" id="btnUserData">打开配置目录</button>
+              <p class="fine">重装 / 换电脑时，把 config.json 和 crosshair、splash 两个文件夹带走就行。</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ 网盘（v1.3.0） ============ -->
+        <section class="page" data-page="pan">
+          <div class="pan-auth" id="panAuthBar">
+            <div class="pa-plat" data-plat="quark">
+              <span class="pa-logo q">Q</span>
+              <div class="pa-text"><b>夸克网盘</b><span id="paStateQuark">未连接</span></div>
+              <button class="btn sm" data-panlogin="quark">连接</button>
+            </div>
+            <div class="pa-plat" data-plat="uc">
+              <span class="pa-logo u">U</span>
+              <div class="pa-text"><b>UC 网盘</b><span id="paStateUc">未连接</span></div>
+              <button class="btn sm" data-panlogin="uc">连接</button>
+            </div>
+            <div class="pa-dest">
+              <span>保存到</span>
+              <b id="panDestPath" title="">—</b>
+              <button class="linkbtn" id="panPickDest">换位置</button>
+              <button class="linkbtn" id="panOpenDest">打开</button>
+            </div>
+          </div>
+
+          <div class="pan-work">
+            <aside class="pan-pane pan-tree-pane">
+              <div class="pane-head">
+                <b>目录</b>
+                <button class="iconbtn" id="panTreeRefresh" title="重新读取">
+                  <svg><use href="#i-refresh"/></svg>
+                </button>
+              </div>
+              <div class="pt-tree" id="panTree"></div>
+            </aside>
+
+            <section class="pan-pane pan-files-pane">
+              <div class="pane-head">
+                <div class="pf-crumb" id="panCrumb"></div>
+                <div class="pf-tools">
+                  <input class="pf-filter" id="panFilter" placeholder="筛选当前目录…" />
+                  <button class="btn sm ghost" id="panSelAll">全选本页</button>
+                  <button class="btn sm ghost" id="panSelNone">清空</button>
+                </div>
+              </div>
+              <div class="pf-body" id="panFiles">
+                <div class="pf-empty" id="panFilesEmpty">选左边的目录，或先连接网盘</div>
+              </div>
+              <div class="pf-foot">
+                <div class="pf-sel" id="panSelInfo">已选 0 个</div>
+                <button class="btn primary" id="panStartBtn" disabled>开始下载</button>
+              </div>
+            </section>
+
+            <aside class="pan-pane pan-queue-pane">
+              <div class="pane-head">
+                <b>下载队列</b>
+                <button class="linkbtn" id="panQueueClear">清理已完成</button>
+              </div>
+              <div class="pq-body" id="panQueue">
+                <div class="pq-empty">还没有下载任务</div>
+              </div>
+              <div class="pq-foot" id="panQueueFoot"></div>
+            </aside>
+          </div>
+        </section>
+
+        <!-- ============ 云析 PC ============ -->
+        <section class="page" data-page="download">
+          <div class="hero module yunx">
+            <div class="hero-main">
+              <div class="hero-kicker">YUNX DESKTOP · 官方 PC 端</div>
+              <h2>视频解析和大文件，交给云析 PC 版</h2>
+              <p>同一个作者做的桌面端：视频直链、分片并发下载、多网盘转存、在线预览，全都在那边。小抄图片已经内置「一键下载」，这里管剩下的。</p>
+              <div class="yunx-meta" id="yunxMeta">最新版 v1.3.4 · 2026-11-13</div>
+            </div>
+            <div class="hero-side">
+              <button class="btn primary big" id="btnYunxSetup">下载安装版</button>
+              <div class="hint">Windows 10 / 11 · 约 205 MB</div>
+            </div>
+          </div>
+
+          <div class="grid2">
+            <div class="card module">
+              <div class="card-head"><div><h3>两个版本，随你用</h3><p>都在 GitHub 官方发布页</p></div></div>
+              <div class="dl-option">
+                <div><b>安装版 · setup.exe</b><span>装进系统，开始菜单有入口，支持自动更新</span></div>
+                <button class="btn" data-open="setup">下载</button>
+              </div>
+              <div class="dl-option">
+                <div><b>便携版 · win64-portable.zip</b><span>解压就能跑，不写注册表，适合放 U 盘</span></div>
+                <button class="btn ghost" data-open="portable">下载</button>
+              </div>
+              <div class="row-actions">
+                <button class="btn ghost" id="btnYunxReleases"><svg><use href="#i-link"/></svg>打开发布页</button>
+                <button class="btn ghost" id="btnYunxCopy">复制下载链接</button>
+              </div>
+            </div>
+
+            <div class="card module">
+              <div class="card-head"><div><h3>那边有什么</h3><p>Android 版的解析 / 下载能力</p></div></div>
+              <ul class="feature-list">
+                <li><svg><use href="#i-check"/></svg>夸克 / UC / 迅雷 / 百度 / 139 / 123 / 115 分享链接解析</li>
+                <li><svg><use href="#i-check"/></svg>抖音 / 小红书 / 快手 / B站 / 微博 视频直链</li>
+                <li><svg><use href="#i-check"/></svg>Range 分片并发 + 断点续传，并发上限 32</li>
+                <li><svg><use href="#i-check"/></svg>图片 / 视频 / 音频在线预览</li>
+                <li><svg><use href="#i-check"/></svg>多网盘登录与 Cookie 备份</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="card module note">
+            <div class="note-icon">i</div>
+            <div>
+              <b>为什么通用解析不在这里重做</b>
+              <p>视频平台和十几家网盘的接口天天变，两套代码就是两倍维护。小抄只需要图片，已经内置下载；视频、大文件、转存这些交给官方 PC 端更稳。</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ 关于 ============ -->
+        <section class="page" data-page="about">
+          <div class="card module about-top">
+            <img src="../../../assets/icon.png" alt="" class="about-icon" />
+            <div>
+              <h2>云小抄 <span>PC</span></h2>
+              <p id="aboutVersion">v1.4.0 · 功能对齐 Android v2.4.0</p>
+              <p class="fine">悬浮攻略 · 多悬浮球 · 网盘管理（1:1 目录 / 整文件夹下载 / 防重复）· 多套准星 · 碎格 / 浮现</p>
+            </div>
+            <div class="about-badge">AGPL-3.0</div>
+          </div>
+
+          <div class="card module">
+            <div class="card-head"><div><h3>这次搬了什么</h3><p>Android → Windows 的功能对照</p></div></div>
+            <table class="port-table">
+              <thead><tr><th>功能</th><th>PC 版</th><th>说明</th></tr></thead>
+              <tbody>
+                <tr><td>悬浮小抄</td><td><i class="ok">已移植</i></td><td>透明置顶、拖动缩放、锁定穿透、透明度和宽度可调</td></tr>
+                <tr><td>攻略库</td><td><i class="ok">已移植</i></td><td>本地文件夹来源，缩略图带磁盘缓存，打开不卡</td></tr>
+                <tr><td>网盘一键下载</td><td><i class="ok">新增</i></td><td>夸克 / UC 分享链接解析成树，勾哪些下哪些</td></tr>
+                <tr><td>网盘文件管理</td><td><i class="ok">新增</i></td><td>目录树浏览、跨目录多选、下载队列；本地目录与网盘 1:1，索引判定重复，已下过的绝不再下</td></tr>
+                <tr><td>多套准星</td><td><i class="ok">已移植</i></td><td>导入图片、点图设锚点、最多 24 套、快捷键轮换</td></tr>
+                <tr><td>碎格 / 浮现</td><td><i class="ok">已移植</i></td><td>入场与切页分开设，四档速度</td></tr>
+                <tr><td>自定义开屏</td><td><i class="ok">已移植</i></td><td>图片 / 视频，点击跳过，视频封顶 15 秒</td></tr>
+                <tr><td>自动连招</td><td><i class="no">未移植</i></td><td>要注入按键事件，桌面端风险和收益不成正比</td></tr>
+                <tr><td>视频解析 / 转存</td><td><i class="ok">已接</i></td><td>入口指向官方云析 PC 版，不重复造轮子</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card module">
+            <div class="card-head"><div><h3>更新说明</h3><p>按版本倒序，新增 / 优化 / 修复分开列</p></div></div>
+            <div class="changelog">
+
+              <details class="cl-item" open>
+                <summary><b>v1.4.0</b><span>2026-11-17</span><i class="ok">当前版本</i></summary>
+                <div class="cl-body">
+                  <h5 class="cl-new">新增</h5>
+                  <ul>
+                    <li>悬浮球系统：最多 3 个，每个绑一个分类文件夹；点球直接弹该分类第一张图</li>
+                    <li>右键球换绑分类、Alt+滚轮改大小、拖到哪记到哪（多屏也不丢）</li>
+                    <li>双模式显隐：热键 A（Alt+X）切大图，热键 B（Alt+Z）只切悬浮球</li>
+                    <li>网盘支持「整个文件夹」勾选下载（目录树三态勾选，不用一个个点）</li>
+                    <li>设置页内置《操作教程》与这份《更新说明》</li>
+                    <li>全局日志：崩溃 / 未处理异常都落盘，可在关于页导出诊断</li>
+                  </ul>
+                  <h5 class="cl-opt">优化</h5>
+                  <ul>
+                    <li>智能穿透：鼠标离开小抄约 2.6 秒自动回穿透，挪回来立刻恢复可点，不用再按热键</li>
+                    <li>滚轮翻页、Ctrl+滚轮缩放、Alt+滚轮透明度，三件事分开不打架</li>
+                    <li>目录扫描加预算（最多 3000 条目 / 60ms），绑定几万文件的目录不再假死</li>
+                    <li>缩略图跳过 12MB 以上的大图，交给渲染进程零拷贝直读</li>
+                    <li>下载失败原因显示在任务卡片上，不再只有一句「失败 3 个」</li>
+                  </ul>
+                  <h5 class="cl-fix">修复</h5>
+                  <ul>
+                    <li>分享下载的落盘路径没做越界校验，网盘里出现 <code>..</code> 时可能写到保存目录之外</li>
+                    <li>异步异常没人接（Node 20 会直接退出进程），表现为「双击没反应」</li>
+                    <li>窗口隐藏后仍保留穿透标记，下次呼出第一次点击会穿到桌面</li>
+                    <li>Windows 保留名（CON / AUX / COM1）与尾部空格导致的落盘失败</li>
+                  </ul>
+                </div>
+              </details>
+
+              <details class="cl-item">
+                <summary><b>v1.3.0</b><span>2026-11-16</span></summary>
+                <div class="cl-body">
+                  <h5 class="cl-new">新增</h5>
+                  <ul>
+                    <li>「网盘」页：目录树 / 文件列表 / 下载队列三栏，跨目录多选一起下</li>
+                    <li>本地目录与网盘 1:1 复刻；索引 + 相对路径 + 大小 + 修改时间四条件判定重复</li>
+                    <li>下载预检：下之前先告诉你「要下几个、跳过几个、共多少 MB」</li>
+                  </ul>
+                  <h5 class="cl-opt">优化</h5>
+                  <ul><li>任务串行、任务内 3 车道，避开网盘风控</li></ul>
+                </div>
+              </details>
+
+              <details class="cl-item">
+                <summary><b>v1.2.6</b><span>2026-11-15</span></summary>
+                <div class="cl-body">
+                  <h5 class="cl-opt">优化</h5>
+                  <ul>
+                    <li>挑文件界面 1800 个文件从「卡两秒」到秒开（分类默认折叠、单次遍历统计）</li>
+                    <li>缩略图异步队列，冻结时间 1653ms → 39ms</li>
+                  </ul>
+                </div>
+              </details>
+
+              <details class="cl-item">
+                <summary><b>v1.2.5</b><span>2026-11-14</span></summary>
+                <div class="cl-body">
+                  <h5 class="cl-new">新增</h5>
+                  <ul><li>给链接 → 指定目录 → 自己勾选要下哪些文件的独立界面</li></ul>
+                </div>
+              </details>
+
+              <details class="cl-item">
+                <summary><b>v1.2.4</b><span>2026-11-13</span></summary>
+                <div class="cl-body">
+                  <h5 class="cl-new">新增</h5>
+                  <ul><li>检测 Windows 独占全屏（D3D fullscreen）并给出可操作的建议</li></ul>
+                  <h5 class="cl-fix">修复</h5>
+                  <ul><li>锁定按钮一点即穿透、无法撤销 —— 改成 3 秒倒计时可撤销</li></ul>
+                </div>
+              </details>
+
+            </div>
+          </div>
+
+          <div class="grid2">
+            <div class="card module">
+              <div class="card-head"><div><h3>来源与协议</h3><p>这不是从零写的东西</p></div></div>
+              <p class="para">基于 <b>云析 YunX</b>（CYQawa）与 Android 版 <b>云小抄</b> 二次开发，按 AGPL-3.0 开源。改了什么、为什么改，都写在源码注释里。</p>
+              <div class="row-actions">
+                <button class="btn ghost" data-href="https://github.com/CYQawa/YunX"><svg><use href="#i-link"/></svg>云析 YunX</button>
+                <button class="btn ghost" data-href="https://github.com/tidain/YunX-Desktop"><svg><use href="#i-link"/></svg>云析 PC 端</button>
+              </div>
+            </div>
+            <div class="card module">
+              <div class="card-head"><div><h3>说清楚</h3><p>自己用，别拿去卖</p></div></div>
+              <p class="para">准星与悬浮窗只是屏幕叠加，不读内存、不改游戏文件。部分竞技游戏会把任何叠加层视为违规，封号风险自己承担。</p>
+              <p class="para">原项目作者不提供任何收费版本，遇到卖钱的都是二次打包的骗子。</p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </section>
+  </div>
+
+  <!-- 碎格幕布 -->
+  <canvas id="curtain"></canvas>
+
+  <!-- 开屏 -->
+  <div class="splash" id="splash">
+    <div class="splash-media" id="splashMedia"></div>
+    <div class="splash-builtin" id="splashBuiltin">
+      <img src="../../../assets/icon.png" alt="" />
+      <b>云小抄</b>
+      <span>PC</span>
+    </div>
+    <div class="splash-bar"><i id="splashBar"></i></div>
+    <div class="splash-skip">轻触跳过</div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- 分享链接下载 -->
+  <div class="modal-mask" id="shareModal">
+    <div class="modal wide">
+      <h4>从分享链接下载</h4>
+      <p>粘夸克 / UC 的分享链接或整段文案。想挑文件就点「读取文件列表」，想整份拿就直接点「全部下载」，不用一个个勾。</p>
+      <textarea class="modal-input" id="shareText" rows="4" placeholder="https://pan.quark.cn/s/xxxx&#10;提取码：abcd"></textarea>
+      <div class="field-row">
+        <input class="modal-input" id="sharePwd" maxlength="8" placeholder="提取码（链接里带了就不用填）" />
+      </div>
+      <div class="modal-note">保存到 <b id="shareDest">—</b><button class="linkbtn" id="btnSharePick">换一个位置</button></div>
+      <div class="modal-tip" id="shareHint"></div>
+      <div class="modal-actions">
+        <button class="btn ghost" data-close="shareModal">取消</button>
+        <button class="btn ghost" id="btnShareAll">全部下载</button>
+        <button class="btn primary" id="btnShareGo">读取文件列表</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 网盘下载预检：说清「要下多少 / 跳过多少」再动手 -->
+  <div class="modal-mask" id="panConfirm">
+    <div class="modal pan-confirm">
+      <h4>这次要下多少</h4>
+      <p class="pc-sub" id="pcSub">—</p>
+      <div class="pc-grid">
+        <div class="pc-cell"><b id="pcDown">0</b><span>要下载</span></div>
+        <div class="pc-cell ok"><b id="pcSkip">0</b><span>已存在·跳过</span></div>
+        <div class="pc-cell"><b id="pcBytes">0 B</b><span>需下载体积</span></div>
+        <div class="pc-cell warn"><b id="pcCollide">0</b><span>同名冲突</span></div>
+      </div>
+      <div class="pc-list" id="pcList"></div>
+      <div class="modal-note">保存到 <b id="pcDest">—</b></div>
+      <div class="modal-actions">
+        <button class="btn ghost" data-close="panConfirm">取消</button>
+        <button class="btn primary" id="pcGo">开始下载</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 选择性下载：分享里的文件树，勾哪些下哪些 -->
+  <div class="modal-mask" id="pickModal">
+    <div class="modal picker">
+      <div class="picker-head">
+        <h4 id="pickTitle">选择要下载的文件</h4>
+        <p class="picker-sub" id="pickSub">—</p>
+      </div>
+      <div class="picker-bar">
+        <button class="linkbtn" id="pickAll">全选</button>
+        <button class="linkbtn" id="pickNone">全不选</button>
+        <button class="linkbtn" id="pickImages">只选图片</button>
+        <button class="linkbtn" id="pickExpand">展开全部</button>
+        <span class="picker-stat" id="pickStat">已选 0 个</span>
+      </div>
+      <div class="picker-tree" id="pickTree"></div>
+      <div class="modal-note">保存到 <b id="pickDest">—</b><button class="linkbtn" id="pickDir">换一个位置</button></div>
+      <div class="modal-actions">
+        <button class="btn ghost" data-close="pickModal">取消</button>
+        <button class="btn primary" id="pickGo" disabled>下载选中的 0 个</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 我的网盘 -->
+  <div class="modal-mask" id="cloudModal">
+    <div class="modal wide">
+      <h4>从我的网盘下载</h4>
+      <div class="pan-tabs" id="panTabs">
+        <button data-pan="quark">夸克网盘</button>
+        <button data-pan="uc">UC 网盘</button>
+      </div>
+
+      <div class="pan-login" id="panLoginBox" hidden>
+        <p>还没登录。点下面打开官方登录页，<b>右边那块二维码</b>扫码即可，登录成功后窗口自动关。</p>
+        <div class="pan-login-btns">
+          <button class="btn primary" id="btnPanLogin">打开登录页</button>
+          <button class="btn ghost" id="btnPanPaste">粘贴 Cookie</button>
+        </div>
+        <p class="fine">登录页打不开、或打开后一直白屏，用「粘贴 Cookie」：在浏览器里登录同一网盘，F12 → Application → Cookies，把 <b>__pus</b> 和 <b>__puus</b> 两行所在的整段 Cookie 复制过来。</p>
+      </div>
+
+      <div class="pan-browse" id="panBrowseBox" hidden>
+        <div class="crumbs" id="panCrumbs"></div>
+        <div class="pan-list" id="panList"></div>
+        <div class="modal-note">当前目录 <b id="panImages">0</b> 张图片，子文件夹会一起下</div>
+      </div>
+
+      <div class="modal-tip" id="panHint"></div>
+      <div class="modal-actions">
+        <button class="btn ghost" data-close="cloudModal">取消</button>
+        <button class="btn primary" id="btnCloudGo" disabled>下载这个目录</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="pan.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>

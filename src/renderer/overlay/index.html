@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; img-src 'self' guide: media: data:; style-src 'self' 'unsafe-inline'; script-src 'self';" />
+  <title>小抄</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <link rel="stylesheet" href="overlay.css" />
+</head>
+<body class="overlay">
+  <div class="shell" id="shell">
+    <header class="bar" id="bar">
+      <button class="ico" id="btnBack" title="返回上一级">‹</button>
+      <div class="crumb" id="crumb">小抄</div>
+      <div class="tools">
+        <button class="ico" id="btnRefresh" title="刷新">⟳</button>
+        <button class="ico" id="btnLock" title="锁定穿透">⛓</button>
+        <button class="ico" id="btnBall" title="收成小球">–</button>
+        <button class="ico danger" id="btnClose" title="关闭小抄">✕</button>
+      </div>
+    </header>
+
+    <div class="chips" id="chips"></div>
+
+    <main class="grid" id="grid"></main>
+
+    <div class="state" id="state">
+      <div class="state-inner">
+        <div class="state-icon">抄</div>
+        <b id="stateTitle">还没选攻略文件夹</b>
+        <p id="stateText">把手机上的「本地小抄」文件夹拷到电脑，或者新建一个目录，里面按分类放图片。</p>
+        <button class="pick" id="btnPick">选择文件夹</button>
+      </div>
+    </div>
+
+    <footer class="dock" id="dock">
+      <div class="dock-row">
+        <span class="k">透明</span>
+        <input type="range" id="alpha" min="25" max="100" value="100" />
+        <b id="alphaVal">100%</b>
+      </div>
+      <div class="dock-row">
+        <span class="k">窗口</span>
+        <input type="range" id="width" min="300" max="820" value="400" />
+        <b id="widthVal">400</b>
+      </div>
+    </footer>
+
+    <div class="resize" id="resize"></div>
+  </div>
+
+  <div class="ball" id="ball" title="展开小抄">
+    <img src="../../../assets/icon.png" alt="" />
+    <span>抄</span>
+  </div>
+
+  <div class="viewer" id="viewer">
+    <div class="viewer-top">
+      <span id="viewerName"></span>
+      <div class="viewer-tools">
+        <span id="viewerIdx"></span>
+        <button class="ico" id="btnZoom" title="原始 / 放大">1×</button>
+        <button class="ico" id="btnVClose" title="关闭">✕</button>
+      </div>
+    </div>
+    <div class="viewer-stage" id="viewerStage">
+      <img id="viewerImg" alt="" />
+    </div>
+    <button class="nav prev" id="btnPrev">‹</button>
+    <button class="nav next" id="btnNext">›</button>
+    <div class="viewer-hint">滚轮翻页 · Ctrl+滚轮缩放 · Alt+滚轮透明度 · 拖动平移 · Esc 关闭</div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="overlay.js"></script>
+</body>
+</html>

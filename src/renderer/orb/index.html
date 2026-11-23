@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; img-src guide: data:; style-src 'self' 'unsafe-inline'; script-src 'self'" />
+  <title>悬浮球</title>
+  <link rel="stylesheet" href="orb.css" />
+</head>
+<body>
+  <!-- 一个球就三层：封面 / 空态字 / 计数角标。不做多余装饰，
+       透明窗口越大越费合成，球体本身只有 54px -->
+  <div class="ball" id="ball">
+    <img class="cover" id="cover" alt="" draggable="false" />
+    <div class="glyph" id="glyph">抄</div>
+    <div class="ring"></div>
+    <div class="count" id="count"></div>
+  </div>
+  <div class="tip" id="tip"></div>
+  <script src="orb.js"></script>
+</body>
+</html>

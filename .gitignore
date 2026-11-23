@@ -1,0 +1,18 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Electron build output
+dist/
+out/
+*.asar
+
+# 上传的原始压缩包 / 临时文件（不参与仓库）
+.uploads/
+*.zip
+*.tmp
+.DS_Store
+
+# 本地运行产物
+*.log

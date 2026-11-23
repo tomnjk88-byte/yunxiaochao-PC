@@ -1,0 +1,131 @@
+/* 悬浮球（v1.4.0）
+   窗口本身 80×80 透明，球体居中。所有尺寸都乘 --s，右键菜单里的「小/中/大」只改这个变量。 */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+
+body {
+  display: grid;
+  place-items: center;
+  font: 500 12px/1.2 "Microsoft YaHei UI", "PingFang SC", system-ui, sans-serif;
+}
+
+.ball {
+  --s: 1;
+  width: calc(58px * var(--s));
+  height: calc(58px * var(--s));
+  position: relative;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: radial-gradient(120% 120% at 30% 20%, #2a2f3d 0%, #171a22 70%);
+  box-shadow:
+    0 6px 16px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.16) inset;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  will-change: transform;
+}
+
+.ball:hover {
+  transform: scale(1.06);
+  box-shadow:
+    0 8px 22px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.3) inset,
+    0 0 0 3px rgba(120, 140, 255, 0.22);
+}
+
+.ball:active {
+  transform: scale(0.97);
+}
+
+.cover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.95;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+.ball.empty .cover {
+  display: none;
+}
+
+.glyph {
+  /* 没有封面时退回一个字，比显示一个破图标体面 */
+  display: none;
+  position: relative;
+  font-size: calc(20px * var(--s));
+  font-weight: 700;
+  color: #eef1ff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+  letter-spacing: 0.02em;
+}
+
+.ball.empty .glyph {
+  display: block;
+}
+
+.ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  pointer-events: none;
+}
+
+.count {
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: rgba(10, 12, 18, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #dfe4ff;
+  font-size: 9.5px;
+  font-weight: 700;
+  line-height: 14px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.ball:hover .count {
+  opacity: 1;
+}
+
+.count:empty {
+  display: none;
+}
+
+/* 拖拽时的视觉反馈：轻微变暗 + 不缩放，避免和鼠标位置打架 */
+body.dragging .ball {
+  transform: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), 0 0 0 2px rgba(120, 140, 255, 0.4);
+}
+
+/* 球被隐藏时（热键 B）整个页面淡出，主进程收尾会 hide 窗口 */
+body.hidden {
+  opacity: 0;
+}
