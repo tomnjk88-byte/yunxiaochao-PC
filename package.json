@@ -5,5 +5,15 @@
   "description": "云小抄 PC · 多悬浮球 / 悬浮攻略窗 / 网盘下载管理（1:1 目录 · 整文件夹下载 · 防重复）/ 多套准星",
   "main": "src/main/main.js",
   "author": "云小抄",
-  "license": "AGPL-3.0"
+  "license": "AGPL-3.0",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "pack:win": "electron-packager . --platform=win32 --arch=x64 --out=dist --overwrite --icon=assets/icon.ico --asar --prune --ignore=\"^/dist\" --ignore=\"^/node_modules\""
+  },
+  "devDependencies": {
+    "@electron/packager": "^20.3.0",
+    "electron": "33.2.1",
+    "resedit": "^3.1.0"
+  }
 }
