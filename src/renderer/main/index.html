@@ -517,7 +517,7 @@
             <img src="../../../assets/icon.png" alt="" class="about-icon" />
             <div>
               <h2>云小抄 <span>PC</span></h2>
-              <p id="aboutVersion">v1.4.0 · 功能对齐 Android v2.4.0</p>
+              <p id="aboutVersion">v1.4.1 · 功能对齐 Android v2.4.0</p>
               <p class="fine">悬浮攻略 · 多悬浮球 · 网盘管理（1:1 目录 / 整文件夹下载 / 防重复）· 多套准星 · 碎格 / 浮现</p>
             </div>
             <div class="about-badge">AGPL-3.0</div>
@@ -546,7 +546,20 @@
             <div class="changelog">
 
               <details class="cl-item" open>
-                <summary><b>v1.4.0</b><span>2026-11-17</span><i class="ok">当前版本</i></summary>
+                <summary><b>v1.4.1</b><span>2026-11-24</span><i class="ok">当前版本</i></summary>
+                <div class="cl-body">
+                  <h5 class="cl-fix">修复</h5>
+                  <ul>
+                    <li>锁定穿透下滚轮翻页失效：主进程用原生 wheel-scroll 兜底转发，锁定/智能穿透时也能翻页</li>
+                    <li>点「解锁」后窗口仍是穿透态：只在窗口真正不可点（已忽略鼠标）时才清锁定配置</li>
+                    <li>智能穿透看门狗会误改锁定状态：锁定时只维持置顶，不再改写可点性</li>
+                    <li>上次在锁定穿透状态退出程序，下次启动窗口点不动：启动时清理残留的锁定标记</li>
+                  </ul>
+                </div>
+              </details>
+
+              <details class="cl-item">
+                <summary><b>v1.4.0</b><span>2026-11-17</span></summary>
                 <div class="cl-body">
                   <h5 class="cl-new">新增</h5>
                   <ul>

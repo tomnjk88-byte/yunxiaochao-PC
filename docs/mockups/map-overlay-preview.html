@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>云小抄 · 地图覆盖模式 样图（v1.5 预览）</title>
+<style>
+  :root{
+    --bg:#0b0f16; --panel:#111826; --line:#1f2b3d;
+    --txt:#e6edf6; --dim:#8fa0b5; --cyan:#4dd8e6; --amber:#f2b035;
+    --green:#43d17c; --red:#ef5f6b; --violet:#9d7bff;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 15% -10%, #16233a 0%, transparent 60%),
+      radial-gradient(900px 500px at 90% 110%, #1a1530 0%, transparent 55%),
+      var(--bg);
+    color:var(--txt);
+    font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",system-ui,sans-serif;
+    padding:28px 26px 40px;
+  }
+  .wrap{max-width:1400px; margin:0 auto;}
+  header.top{display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:22px; flex-wrap:wrap;}
+  .brand{display:flex; align-items:center; gap:12px;}
+  .logo{
+    width:42px; height:42px; border-radius:11px;
+    background:linear-gradient(135deg,#4dd8e6,#2b7cff 60%,#9d7bff);
+    display:grid; place-items:center; font-weight:800; color:#06121c; font-size:15px;
+    box-shadow:0 6px 20px rgba(77,216,230,.25);
+  }
+  h1{font-size:20px; letter-spacing:.5px;}
+  h1 small{color:var(--dim); font-weight:400; font-size:13px; margin-left:8px;}
+  .tag{font-size:12px; color:var(--cyan); border:1px solid rgba(77,216,230,.35); background:rgba(77,216,230,.08); padding:5px 10px; border-radius:999px;}
+  .grid{display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
+  @media (max-width:1100px){ .grid{grid-template-columns:1fr;} }
+
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:16px; overflow:hidden;}
+  .card-head{padding:13px 16px 11px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:10px;}
+  .step{width:22px; height:22px; border-radius:7px; background:rgba(77,216,230,.14); color:var(--cyan); font-size:12px; font-weight:700; display:grid; place-items:center;}
+  .card-head h2{font-size:14.5px; font-weight:600;}
+  .card-head p{font-size:11.5px; color:var(--dim); margin-top:3px;}
+  .stage{position:relative; height:430px; overflow:hidden; background:#070b11;}
+
+  /* ---------- 游戏地图（SVG 模拟） ---------- */
+  .map{position:absolute; inset:0; transform-origin:52% 48%; transition:transform .45s ease;}
+  .map svg{width:100%; height:100%; display:block;}
+  .map-zoom-tag{
+    position:absolute; left:12px; top:12px; z-index:3;
+    font-size:11px; color:var(--dim); background:rgba(8,12,18,.72);
+    border:1px solid var(--line); border-radius:7px; padding:4px 8px; backdrop-filter:blur(4px);
+  }
+
+  /* ---------- 小抄覆盖窗 ---------- */
+  .sheet{
+    position:absolute; z-index:5; width:224px;
+    right:16px; top:52px; border-radius:12px;
+    background:rgba(13,19,29,.72);
+    border:1px solid rgba(120,160,200,.35);
+    box-shadow:0 14px 38px rgba(0,0,0,.5);
+    backdrop-filter:blur(2px);
+    overflow:hidden;
+    transition:transform .45s ease, opacity .25s ease;
+  }
+  .sheet-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:8px 10px; font-size:11.5px; color:#cfe4f5;
+    background:rgba(38,58,84,.55); border-bottom:1px solid rgba(120,160,200,.22);
+  }
+  .sheet-head b{font-size:12px; letter-spacing:.3px;}
+  .sheet-body{padding:9px 10px 10px; font-size:10.5px; line-height:1.55; color:#c6d6e6;}
+  .row{display:flex; align-items:center; gap:6px; margin-bottom:5px;}
+  .dot{width:7px; height:7px; border-radius:50%; flex:0 0 auto;}
+  .thumb{
+    height:82px; border-radius:8px; margin:7px 0 8px; position:relative; overflow:hidden;
+    background:
+      radial-gradient(60px 40px at 25% 30%, rgba(77,216,230,.30), transparent 70%),
+      radial-gradient(80px 50px at 75% 70%, rgba(157,123,255,.28), transparent 70%),
+      repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0 1px, transparent 1px 14px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 1px, transparent 1px 14px),
+      #0e1724;
+    border:1px solid rgba(120,160,200,.2);
+  }
+  .thumb::after{
+    content:"小抄图示"; position:absolute; left:7px; bottom:5px;
+    font-size:9px; color:rgba(198,214,230,.65);
+  }
+  .pill{
+    display:inline-block; font-size:9.5px; padding:2px 7px; border-radius:999px;
+    background:rgba(77,216,230,.12); color:var(--cyan); border:1px solid rgba(77,216,230,.28);
+    margin-top:6px;
+  }
+
+  /* 状态二：穿透 */
+  .pass-frame{position:absolute; inset:0; z-index:7; pointer-events:none; border:2px dashed rgba(77,216,230,.55); border-radius:16px; opacity:0; transition:opacity .3s;}
+  .pass-badge{
+    position:absolute; z-index:8; left:50%; bottom:14px; transform:translateX(-50%);
+    font-size:10.5px; color:#062028; background:var(--cyan); padding:5px 12px; border-radius:999px;
+    font-weight:700; box-shadow:0 6px 18px rgba(77,216,230,.35); opacity:0; transition:opacity .3s;
+  }
+  .cursor{position:absolute; z-index:9; width:18px; height:24px; opacity:0; transition:opacity .3s;}
+  .ripple{
+    position:absolute; z-index:9; width:46px; height:46px; border-radius:50%;
+    border:2px solid rgba(77,216,230,.75); opacity:0; transform:translate(-50%,-50%) scale(.4);
+  }
+  .state-b .sheet{opacity:.62;}
+  .state-b .pass-frame{opacity:1;}
+  .state-b .pass-badge{opacity:1;}
+  .state-b .cursor{opacity:1;}
+  .state-b .ripple{animation:rip 1.8s ease-out infinite;}
+  @keyframes rip{
+    0%{opacity:.85; transform:translate(-50%,-50%) scale(.35);}
+    100%{opacity:0; transform:translate(-50%,-50%) scale(1.6);}
+  }
+
+  /* 状态三：缩放联动 */
+  .state-c .map{transform:scale(1.5);}
+  .state-c .sheet{transform:scale(1.5); transform-origin:12% 88%;}
+  .anchor-line{
+    position:absolute; z-index:6; left:0; top:0; width:100%; height:100%;
+    pointer-events:none; opacity:0; transition:opacity .3s;
+  }
+  .state-c .anchor-line{opacity:1;}
+  .anchor-label{
+    position:absolute; z-index:8; font-size:10px; color:#0b1a22; background:var(--amber);
+    padding:3px 8px; border-radius:6px; font-weight:700; opacity:0; transition:opacity .3s;
+  }
+  .state-c .anchor-label{opacity:1;}
+
+  /* ---------- 底部控件条 ---------- */
+  .controlbar{
+    margin-top:18px; background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:14px 18px; display:flex; align-items:center; gap:26px; flex-wrap:wrap;
+  }
+  .ctl{display:flex; align-items:center; gap:10px; font-size:12px; color:var(--dim);}
+  .ctl b{color:var(--txt); font-weight:600;}
+  .slider{position:relative; width:150px; height:6px; border-radius:99px; background:#243247;}
+  .slider i{position:absolute; left:0; top:0; height:6px; width:70%; border-radius:99px; background:linear-gradient(90deg,var(--cyan),#2b7cff);}
+  .slider u{position:absolute; right:28%; top:50%; width:14px; height:14px; margin-top:-7px; border-radius:50%; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,.5);}
+  .switch{width:38px; height:20px; border-radius:99px; background:#243247; position:relative;}
+  .switch.on{background:rgba(67,209,124,.35);}
+  .switch::after{content:""; position:absolute; top:2px; right:2px; width:16px; height:16px; border-radius:50%; background:#fff;}
+  .switch:not(.on)::after{right:auto; left:2px;}
+  .btn-ghost{border:1px solid var(--line); background:#0e1622; color:var(--txt); font-size:12px; padding:7px 12px; border-radius:9px;}
+  .hint{margin-left:auto; font-size:11.5px; color:var(--dim);}
+  .hint em{color:var(--cyan); font-style:normal;}
+
+  /* ---------- 说明栏 ---------- */
+  .notes{margin-top:16px; display:grid; grid-template-columns:repeat(3,1fr); gap:14px;}
+  @media (max-width:1100px){ .notes{grid-template-columns:1fr;} }
+  .note{background:rgba(17,24,38,.7); border:1px solid var(--line); border-radius:12px; padding:12px 14px; font-size:12px; color:var(--dim); line-height:1.7;}
+  .note b{display:block; color:var(--txt); font-size:12.5px; margin-bottom:4px;}
+  .note code{color:var(--cyan); background:rgba(77,216,230,.1); padding:1px 5px; border-radius:4px; font-size:11px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="logo">云</div>
+      <div>
+        <h1>地图覆盖模式 样图<small>超自然行动组 · 小抄贴地图 · 透明 / 穿透 / 缩放联动</small></h1>
+      </div>
+    </div>
+    <div class="tag">v1.5 设计预览 · 非最终效果</div>
+  </header>
+
+  <div class="grid">
+    <!-- 状态一 -->
+    <section class="card">
+      <div class="card-head">
+        <div class="step">1</div>
+        <div>
+          <h2>覆盖 · 半透明可读</h2>
+          <p>小抄贴在地图上，透明度 70%，地图分层仍可见</p>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="map">
+          <svg viewBox="0 0 420 430" preserveAspectRatio="xMidYMid slice">
+            <defs>
+              <pattern id="g1" width="28" height="28" patternUnits="userSpaceOnUse">
+                <path d="M28 0H0V28" fill="none" stroke="#1b293d" stroke-width="1"/>
+              </pattern>
+              <linearGradient id="road" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#20304a"/><stop offset="1" stop-color="#182539"/>
+              </linearGradient>
+            </defs>
+            <rect width="420" height="430" fill="#0a1019"/>
+            <rect width="420" height="430" fill="url(#g1)"/>
+            <!-- 街区 -->
+            <g fill="#16233a" stroke="#22344f" stroke-width="1.2">
+              <rect x="26" y="34" width="112" height="86" rx="4"/>
+              <rect x="168" y="26" width="96" height="70" rx="4"/>
+              <rect x="296" y="42" width="98" height="92" rx="4"/>
+              <rect x="30" y="156" width="88" height="112" rx="4"/>
+              <rect x="146" y="132" width="122" height="92" rx="4"/>
+              <rect x="294" y="170" width="104" height="76" rx="4"/>
+              <rect x="34" y="304" width="120" height="94" rx="4"/>
+              <rect x="178" y="262" width="92" height="82" rx="4"/>
+              <rect x="292" y="276" width="106" height="104" rx="4"/>
+            </g>
+            <!-- 道路 -->
+            <g stroke="url(#road)" stroke-width="14" fill="none" stroke-linecap="round">
+              <path d="M0 140 H420"/><path d="M0 250 H420"/><path d="M0 390 H420"/>
+              <path d="M150 0 V430"/><path d="M278 0 V430"/>
+            </g>
+            <!-- 地标点 -->
+            <g>
+              <circle cx="214" cy="178" r="9" fill="none" stroke="#f2b035" stroke-width="2"/>
+              <circle cx="214" cy="178" r="3" fill="#f2b035"/>
+              <circle cx="330" cy="98" r="9" fill="none" stroke="#ef5f6b" stroke-width="2"/>
+              <circle cx="330" cy="98" r="3" fill="#ef5f6b"/>
+              <circle cx="86" cy="338" r="9" fill="none" stroke="#43d17c" stroke-width="2"/>
+              <circle cx="86" cy="338" r="3" fill="#43d17c"/>
+              <circle cx="238" cy="316" r="9" fill="none" stroke="#9d7bff" stroke-width="2"/>
+              <circle cx="238" cy="316" r="3" fill="#9d7bff"/>
+            </g>
+            <!-- 玩家 -->
+            <g transform="translate(196 236)">
+              <circle r="16" fill="rgba(77,216,230,.12)"/>
+              <path d="M0 -11 L8 8 L0 4 L-8 8 Z" fill="#4dd8e6"/>
+            </g>
+            <!-- 指北 -->
+            <g transform="translate(392 400)">
+              <circle r="15" fill="rgba(8,12,18,.7)" stroke="#22344f"/>
+              <path d="M0 -9 L4 2 L0 0 L-4 2 Z" fill="#8fa0b5"/>
+              <text x="0" y="12" text-anchor="middle" font-size="7" fill="#8fa0b5">N</text>
+            </g>
+          </svg>
+        </div>
+        <div class="map-zoom-tag">地图缩放 100%</div>
+
+        <div class="sheet">
+          <div class="sheet-head"><b>小抄 · 研究所 2F</b><span style="color:#8fa0b5">1/6</span></div>
+          <div class="sheet-body">
+            <div class="row"><span class="dot" style="background:#f2b035"></span>钥匙房 · 中庭北侧</div>
+            <div class="row"><span class="dot" style="background:#ef5f6b"></span>高危刷怪点 · 东翼</div>
+            <div class="row"><span class="dot" style="background:#43d17c"></span>撤离点 · 西南楼梯</div>
+            <div class="row"><span class="dot" style="background:#9d7bff"></span>隐藏物资 · 实验室</div>
+            <div class="thumb"></div>
+            <div style="color:#8fa0b5; font-size:10px">滚轮翻页 · Ctrl+滚轮缩放 · Alt+滚轮改透明度</div>
+            <span class="pill">透明度 70% · 可读</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 状态二 -->
+    <section class="card state-b">
+      <div class="card-head">
+        <div class="step">2</div>
+        <div>
+          <h2>穿透 · 点击直达游戏</h2>
+          <p>鼠标穿过去点地图，小抄保持可见不挡操作</p>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="map">
+          <svg viewBox="0 0 420 430" preserveAspectRatio="xMidYMid slice">
+            <rect width="420" height="430" fill="#0a1019"/>
+            <rect width="420" height="430" fill="url(#g1)"/>
+            <g fill="#16233a" stroke="#22344f" stroke-width="1.2">
+              <rect x="26" y="34" width="112" height="86" rx="4"/>
+              <rect x="168" y="26" width="96" height="70" rx="4"/>
+              <rect x="296" y="42" width="98" height="92" rx="4"/>
+              <rect x="30" y="156" width="88" height="112" rx="4"/>
+              <rect x="146" y="132" width="122" height="92" rx="4"/>
+              <rect x="294" y="170" width="104" height="76" rx="4"/>
+              <rect x="34" y="304" width="120" height="94" rx="4"/>
+              <rect x="178" y="262" width="92" height="82" rx="4"/>
+              <rect x="292" y="276" width="106" height="104" rx="4"/>
+            </g>
+            <g stroke="url(#road)" stroke-width="14" fill="none" stroke-linecap="round">
+              <path d="M0 140 H420"/><path d="M0 250 H420"/><path d="M0 390 H420"/>
+              <path d="M150 0 V430"/><path d="M278 0 V430"/>
+            </g>
+            <g transform="translate(196 236)">
+              <circle r="16" fill="rgba(77,216,230,.12)"/>
+              <path d="M0 -11 L8 8 L0 4 L-8 8 Z" fill="#4dd8e6"/>
+            </g>
+          </svg>
+        </div>
+        <div class="map-zoom-tag">地图缩放 100%</div>
+
+        <div class="sheet">
+          <div class="sheet-head"><b>小抄 · 研究所 2F</b><span style="color:#8fa0b5">2/6</span></div>
+          <div class="sheet-body">
+            <div class="row"><span class="dot" style="background:#f2b035"></span>钥匙房 · 中庭北侧</div>
+            <div class="row"><span class="dot" style="background:#ef5f6b"></span>高危刷怪点 · 东翼</div>
+            <div class="row"><span class="dot" style="background:#43d17c"></span>撤离点 · 西南楼梯</div>
+            <div class="row"><span class="dot" style="background:#9d7bff"></span>隐藏物资 · 实验室</div>
+            <div class="thumb"></div>
+            <span class="pill">鼠标离开 2.6 秒自动穿透</span>
+          </div>
+        </div>
+
+        <div class="pass-frame"></div>
+        <div class="ripple" style="left:38%; top:62%"></div>
+        <svg class="cursor" style="left:38%; top:62%" viewBox="0 0 18 24">
+          <path d="M2 2 L2 19 L7 14 L11 22 L14 20 L10 13 L16 13 Z" fill="#fff" stroke="#0b0f16" stroke-width="1.4"/>
+        </svg>
+        <div class="pass-badge">已穿透 · 点击落到游戏</div>
+      </div>
+    </section>
+
+    <!-- 状态三 -->
+    <section class="card state-c">
+      <div class="card-head">
+        <div class="step">3</div>
+        <div>
+          <h2>缩放联动 · 跟着地图放大</h2>
+          <p>地图放大 150%，小抄按同一锚点同步缩放</p>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="map">
+          <svg viewBox="0 0 420 430" preserveAspectRatio="xMidYMid slice">
+            <rect width="420" height="430" fill="#0a1019"/>
+            <rect width="420" height="430" fill="url(#g1)"/>
+            <g fill="#16233a" stroke="#22344f" stroke-width="1.2">
+              <rect x="26" y="34" width="112" height="86" rx="4"/>
+              <rect x="168" y="26" width="96" height="70" rx="4"/>
+              <rect x="296" y="42" width="98" height="92" rx="4"/>
+              <rect x="30" y="156" width="88" height="112" rx="4"/>
+              <rect x="146" y="132" width="122" height="92" rx="4"/>
+              <rect x="294" y="170" width="104" height="76" rx="4"/>
+              <rect x="34" y="304" width="120" height="94" rx="4"/>
+              <rect x="178" y="262" width="92" height="82" rx="4"/>
+              <rect x="292" y="276" width="106" height="104" rx="4"/>
+            </g>
+            <g stroke="url(#road)" stroke-width="14" fill="none" stroke-linecap="round">
+              <path d="M0 140 H420"/><path d="M0 250 H420"/><path d="M0 390 H420"/>
+              <path d="M150 0 V430"/><path d="M278 0 V430"/>
+            </g>
+            <g>
+              <circle cx="214" cy="178" r="9" fill="none" stroke="#f2b035" stroke-width="2"/>
+              <circle cx="214" cy="178" r="3" fill="#f2b035"/>
+              <circle cx="330" cy="98" r="9" fill="none" stroke="#ef5f6b" stroke-width="2"/>
+              <circle cx="330" cy="98" r="3" fill="#ef5f6b"/>
+            </g>
+            <g transform="translate(196 236)">
+              <circle r="16" fill="rgba(77,216,230,.12)"/>
+              <path d="M0 -11 L8 8 L0 4 L-8 8 Z" fill="#4dd8e6"/>
+            </g>
+          </svg>
+        </div>
+        <div class="map-zoom-tag">地图缩放 150%</div>
+
+        <div class="sheet">
+          <div class="sheet-head"><b>小抄 · 研究所 2F</b><span style="color:#8fa0b5">3/6</span></div>
+          <div class="sheet-body">
+            <div class="row"><span class="dot" style="background:#f2b035"></span>钥匙房 · 中庭北侧</div>
+            <div class="row"><span class="dot" style="background:#ef5f6b"></span>高危刷怪点 · 东翼</div>
+            <div class="row"><span class="dot" style="background:#43d17c"></span>撤离点 · 西南楼梯</div>
+            <div class="row"><span class="dot" style="background:#9d7bff"></span>隐藏物资 · 实验室</div>
+            <div class="thumb"></div>
+            <span class="pill">绑定锚点 · 随地图缩放</span>
+          </div>
+        </div>
+
+        <svg class="anchor-line" viewBox="0 0 420 430" preserveAspectRatio="none">
+          <line x1="348" y1="330" x2="238" y2="316" stroke="#f2b035" stroke-width="1.4" stroke-dasharray="5 5"/>
+          <circle cx="348" cy="330" r="4" fill="#f2b035"/>
+          <circle cx="238" cy="316" r="5" fill="none" stroke="#f2b035" stroke-width="1.6"/>
+        </svg>
+        <div class="anchor-label" style="right:14px; bottom:64px">锚点同步 ×1.5</div>
+      </div>
+    </section>
+  </div>
+
+  <div class="controlbar">
+    <div class="ctl"><b>透明度</b>
+      <div class="slider"><i></i><u></u></div><span>70%</span>
+    </div>
+    <div class="ctl"><b>跟随地图缩放</b><div class="switch on"></div></div>
+    <div class="ctl"><b>锚点</b><button class="btn-ghost">按住 Alt 点地图设锚点</button></div>
+    <div class="ctl"><b>穿透</b><button class="btn-ghost">智能 / 锁定</button></div>
+    <div class="hint">鼠标挪到小抄上 <em>自动可点</em>，离开约 <em>2.6 秒</em> 自动穿透</div>
+  </div>
+
+  <div class="notes">
+    <div class="note"><b>怎么贴上去</b>小抄是独立透明置顶窗，不注入游戏；拖动摆到地图区域即可，位置会记住。</div>
+    <div class="note"><b>怎么做到「又能点又能穿」</b>鼠标在小抄范围内 = 可点（翻页/拖动）；离开一会儿 = 整窗穿透，点击直达游戏。</div>
+    <div class="note"><b>缩放联动的前提</b>需要先标定一次：<code>Alt+点</code> 指定地图锚点与基准缩放，之后按比例跟随。</div>
+  </div>
+</div>
+
+<script>
+  // 样图演示用：自动循环切换三种状态的视觉提示（不影响静态阅读）
+  const cards = document.querySelectorAll('.card');
+  const mapC = cards[2].querySelector('.map');
+  let tick = 0;
+  setInterval(() => {
+    tick++;
+    if (tick % 8 === 0) mapC.style.transform = 'scale(1.5)';
+    if (tick % 8 === 4) mapC.style.transform = 'scale(1.32)';
+  }, 900);
+</script>
+</body>
+</html>
