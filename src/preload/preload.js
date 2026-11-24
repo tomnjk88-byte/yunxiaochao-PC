@@ -53,6 +53,12 @@ contextBridge.exposeInMainWorld('yunx', {
     setWidth: (v) => invoke('guide:setWidth', v),
     setBall: (v) => invoke('guide:setBall', v),
     setForceTop: (v) => invoke('guide:setForceTop', v),
+    // v1.5.0 地图覆盖模式
+    mapMode: (v) => invoke('guide:mapMode', v),
+    mapState: () => invoke('guide:mapState'),
+    setScale: (v) => invoke('guide:scale', v),
+    setAnchor: (p) => invoke('guide:anchor', p),
+    onMapState: (cb) => subscribe('guide:mapState', cb),
     onReload: (cb) => subscribe('guide:reload', cb),
     // 从悬浮球进来时，主进程告诉页面「直接打开这个目录的第一张图」
     onOpenAt: (cb) => subscribe('guide:openAt', cb),

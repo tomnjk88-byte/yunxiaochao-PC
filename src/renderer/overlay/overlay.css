@@ -193,6 +193,8 @@ html[data-theme="light"] .state p { color: #6b7285; }
 }
 html[data-theme="light"] .dock { border-top-color: rgba(20, 24, 40, 0.06); }
 .dock-row { display: flex; align-items: center; gap: 8px; }
+/* [hidden] 会被 .dock-row 的 display:flex 覆盖，这里显式兜底 */
+.dock-row[hidden] { display: none; }
 .dock-row .k { font-size: 10px; color: #7f8699; width: 24px; flex: 0 0 24px; }
 .dock-row b { font-size: 10px; color: #aab0c2; width: 34px; text-align: right; font-variant-numeric: tabular-nums; font-weight: 500; }
 html[data-theme="light"] .dock-row .k { color: #7a8196; }

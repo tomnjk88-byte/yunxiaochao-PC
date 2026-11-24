@@ -154,6 +154,10 @@
                 <button class="switch" id="switchGuideLock" role="switch"></button>
               </div>
               <div class="switch-row">
+                <div><b>地图覆盖模式</b><span>小抄贴在地图上：半透明、可点可穿；Alt+M 开合，Alt+Shift+滚轮缩放</span></div>
+                <button class="switch" id="switchGuideMap" role="switch"></button>
+              </div>
+              <div class="switch-row">
                 <div><b>游戏模式 · 始终置顶</b><span>窗口一直压在游戏上面，不会被别的窗口盖住</span></div>
                 <button class="switch" id="switchGuideTop" role="switch"></button>
               </div>
@@ -517,7 +521,7 @@
             <img src="../../../assets/icon.png" alt="" class="about-icon" />
             <div>
               <h2>云小抄 <span>PC</span></h2>
-              <p id="aboutVersion">v1.4.1 · 功能对齐 Android v2.4.0</p>
+              <p id="aboutVersion">v1.5.0 · 功能对齐 Android v2.4.0</p>
               <p class="fine">悬浮攻略 · 多悬浮球 · 网盘管理（1:1 目录 / 整文件夹下载 / 防重复）· 多套准星 · 碎格 / 浮现</p>
             </div>
             <div class="about-badge">AGPL-3.0</div>
@@ -546,7 +550,25 @@
             <div class="changelog">
 
               <details class="cl-item" open>
-                <summary><b>v1.4.1</b><span>2026-11-24</span><i class="ok">当前版本</i></summary>
+                <summary><b>v1.5.0</b><span>2026-11-24</span><i class="ok">当前版本</i></summary>
+                <div class="cl-body">
+                  <h5 class="cl-new">新增</h5>
+                  <ul>
+                    <li>地图覆盖模式：一键把小抄贴到游戏地图上，透明度自动降到 62%，仍保持可点 / 可穿</li>
+                    <li>Alt+M 开合地图覆盖；悬浮窗标题栏 ◎ 按钮、设置页「窗口」里也都能切</li>
+                    <li>锚点缩放：Alt+Shift+滚轮等比缩放小抄，缩放以锚点为中心；Alt+Shift+左键把锚点设在鼠标处</li>
+                    <li>缩放比例（60%–160%）、锚点、位置全部持久化，下次打开还原</li>
+                  </ul>
+                  <h5 class="cl-opt">说明</h5>
+                  <ul>
+                    <li>游戏内地图缩放比例无法直接读取，本版采用「手动标定」：先摆好位置，再用 Alt+Shift+滚轮跟地图对齐</li>
+                    <li>待玩家实测手感后，再评估是否加入截屏识别自动跟随</li>
+                  </ul>
+                </div>
+              </details>
+
+              <details class="cl-item">
+                <summary><b>v1.4.1</b><span>2026-11-24</span></summary>
                 <div class="cl-body">
                   <h5 class="cl-fix">修复</h5>
                   <ul>

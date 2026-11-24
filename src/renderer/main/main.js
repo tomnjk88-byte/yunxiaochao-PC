@@ -434,6 +434,7 @@ function renderRuntime(rt) {
   cBtn.textContent = rt.crosshairVisible ? '收 起 准 星' : '开 启 准 星';
 
   setSwitch($('#switchGuideLock'), !!cfg.guide.locked);
+  setSwitch($('#switchGuideMap'), !!cfg.guide.mapMode);
   setSwitch($('#switchGuideTop'), cfg.guide.forceTop !== false);
   $('#btnAdjust').classList.toggle('primary', !!rt.crosshairAdjust);
 }
@@ -465,6 +466,7 @@ function renderGuide() {
   paintRange($('#widthRange'));
 
   setSwitch($('#switchGuideLock'), !!g.locked);
+  setSwitch($('#switchGuideMap'), !!g.mapMode);
   setSwitch($('#switchGuideTop'), g.forceTop !== false);
 
   renderHotkeys();
@@ -1018,6 +1020,20 @@ function bindEvents() {
     setSwitch($('#switchGuideLock'), v);
     await yunx.guide.setLocked(v);
     toast(v ? '已锁定：鼠标会直接穿过小抄' : '已解锁：可以点小抄了');
+  };
+  // v1.5.0：地图覆盖模式
+  $('#switchGuideMap').onclick = async () => {
+    const v = !cfg.guide.mapMode;
+    cfg.guide.mapMode = v;
+    setSwitch($('#switchGuideMap'), v);
+    const st = await yunx.guide.mapMode(v);
+    if (st && st.alpha && st.alpha !== cfg.guide.alpha) {
+      cfg.guide.alpha = st.alpha;
+      const a = Math.round(st.alpha * 100);
+      if ($('#alphaRange')) $('#alphaRange').value = a;
+      if ($('#alphaVal')) $('#alphaVal').textContent = a + '%';
+    }
+    toast(v ? '地图覆盖已开：半透明 + 可点可穿，Alt+Shift+滚轮缩放' : '地图覆盖已关');
   };
   // v1.2.0：游戏模式。开了之后主进程每 800ms 把它顶回最上层
   $('#switchGuideTop').onclick = async () => {

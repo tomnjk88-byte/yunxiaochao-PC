@@ -15,6 +15,7 @@
       <div class="crumb" id="crumb">小抄</div>
       <div class="tools">
         <button class="ico" id="btnRefresh" title="刷新">⟳</button>
+        <button class="ico" id="btnMap" title="地图覆盖模式（Alt+M）">◎</button>
         <button class="ico" id="btnLock" title="锁定穿透">⛓</button>
         <button class="ico" id="btnBall" title="收成小球">–</button>
         <button class="ico danger" id="btnClose" title="关闭小抄">✕</button>
@@ -44,6 +45,11 @@
         <span class="k">窗口</span>
         <input type="range" id="width" min="300" max="820" value="400" />
         <b id="widthVal">400</b>
+      </div>
+      <div class="dock-row" id="dockScale" hidden>
+        <span class="k">缩放</span>
+        <input type="range" id="scale" min="60" max="160" value="100" />
+        <b id="scaleVal">100%</b>
       </div>
     </footer>
 

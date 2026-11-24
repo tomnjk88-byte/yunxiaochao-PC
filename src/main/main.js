@@ -352,6 +352,13 @@ function createGuideWindow() {
   if (IS_WIN) guideWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
   guideWindow.loadFile(pagePath('overlay/index.html'));
   guideWindow.setOpacity(Number(cfg.alpha) || 1);
+  // v1.5.0：恢复上次的缩放。窗口尺寸已经是缩放后的大小，
+  // 页面内容也必须用同样的 zoom，否则会变成「窗口变大、字没变」的假缩放。
+  try {
+    guideWindow.webContents.setZoomFactor(Math.max(0.6, Math.min(1.6, Number(cfg.scale) || 1)));
+  } catch {
+    /* 页面还没加载完时忽略，setZoomFactor 会在 load 后再生效 */
+  }
 
   // 锁定/智能穿透下，鼠标事件（含滚轮）会被系统转发给下层游戏，
   // 渲染进程收不到 wheel。这里用主进程原生的 wheel-scroll 事件兜底，
@@ -453,13 +460,127 @@ function guideSetWidth(width) {
   const maxH = display.workArea.height - 40;
   const next = clampToDisplay({ x: b.x, y: b.y, width: w, height: Math.min(h, maxH) });
   guideWindow.setBounds(next);
-  store.patch({ guide: { w: next.width, h: next.height, x: next.x, y: next.y } });
+  try {
+    guideWindow.webContents.setZoomFactor(1);
+  } catch {
+    /* 忽略 */
+  }
+  // 手动改宽度后，把缩放基准归位（100% = 当前大小），
+  // 否则下一次 Alt+Shift+滚轮 会按旧比例跳一下
+  store.patch({ guide: { w: next.width, h: next.height, x: next.x, y: next.y, scale: 1 } });
   broadcast();
+}
+
+// ---------------------------------------------------------------------------
+// 地图覆盖模式（v1.5.0）
+// ---------------------------------------------------------------------------
+//
+// 需求：玩家打开游戏地图时，把小抄盖在地图上，半透明、能点、能穿。
+// 游戏内部的缩放比例无法直接读取，所以这一版先做「手动标定」形态：
+//   · 一键进入覆盖形态：透明度降到 62%、保持置顶、智能穿透
+//   · Alt+Shift+滚轮：以锚点为中心等比缩放（模拟跟随地图缩放）
+//   · Alt+Shift+左键：把锚点设在鼠标位置
+// 玩家实测手感 OK 后，再决定要不要上截图识别自动跟随。
+
+function guideMapState() {
+  const g = store.get().guide;
+  return {
+    on: !!g.mapMode,
+    scale: Number(g.scale) || 1,
+    alpha: Number(g.alpha) || 1,
+    anchorX: g.anchorX == null ? null : Number(g.anchorX),
+    anchorY: g.anchorY == null ? null : Number(g.anchorY),
+  };
+}
+
+function pushMapState() {
+  if (guideWindow && !guideWindow.isDestroyed()) sendTo(guideWindow, 'guide:mapState', guideMapState());
+}
+
+function guideSetMapMode(on) {
+  const want = !!on;
+  const patch = { mapMode: want };
+  if (want) {
+    // 覆盖模式的默认透明度：小抄看得清，下面的地图也看得清。
+    // 用户已经手动调到 72% 以下就尊重用户，不再覆盖。
+    const cur = Number(store.get().guide.alpha);
+    if (!(cur > 0 && cur <= 0.72)) patch.alpha = 0.62;
+    patch.forceTop = true;
+  }
+  store.patch({ guide: patch });
+  if (guideWindow && !guideWindow.isDestroyed()) {
+    if (patch.alpha) guideWindow.setOpacity(patch.alpha);
+    if (want) pinToTop(guideWindow);
+  }
+  broadcast();
+  pushMapState();
+  return guideMapState();
+}
+
+function guideSetScale(target) {
+  const win = guideWindow;
+  if (!win || win.isDestroyed()) return guideMapState();
+  const g = store.get().guide;
+  const old = Math.max(0.3, Math.min(3, Number(g.scale) || 1));
+  const next = Math.max(0.6, Math.min(1.6, Math.round((Number(target) || old) * 100) / 100));
+  if (Math.abs(next - old) < 0.001) {
+    pushMapState();
+    return guideMapState();
+  }
+  const b = win.getBounds();
+  const ratio = next / old;
+  // 锚点是屏幕坐标；没标定过就用窗口中心，保证缩放时视觉重心不跑
+  const ax = Number.isFinite(Number(g.anchorX)) ? Number(g.anchorX) : b.x + b.width / 2;
+  const ay = Number.isFinite(Number(g.anchorY)) ? Number(g.anchorY) : b.y + b.height / 2;
+  const width = Math.max(260, Math.min(1200, Math.round(b.width * ratio)));
+  const height = Math.max(200, Math.min(1400, Math.round(b.height * ratio)));
+  const x = Math.round(ax - (ax - b.x) * ratio);
+  const y = Math.round(ay - (ay - b.y) * ratio);
+  const bounds = clampToDisplay({ x, y, width, height });
+  win.setBounds(bounds);
+  // 窗口放大 ratio 倍、页面 zoom 也放大 ratio 倍 →
+  // 屏幕上看到的是「整张小抄等比放大」，而不是窗口变大但字没变
+  try {
+    win.webContents.setZoomFactor(next);
+  } catch {
+    /* 忽略 */
+  }
+  store.patch({ guide: { scale: next, x: bounds.x, y: bounds.y, w: bounds.width, h: bounds.height } });
+  sendTo(win, 'guide:size', { width: bounds.width, height: bounds.height });
+  broadcast();
+  pushMapState();
+  return guideMapState();
+}
+
+function guideSetAnchor(x, y) {
+  const win = guideWindow;
+  let ax = Number(x);
+  let ay = Number(y);
+  if (!Number.isFinite(ax) || !Number.isFinite(ay)) {
+    try {
+      const p = screen.getCursorScreenPoint();
+      ax = p.x;
+      ay = p.y;
+    } catch {
+      /* 读不到光标就退回窗口中心 */
+    }
+  }
+  if ((!Number.isFinite(ax) || !Number.isFinite(ay)) && win && !win.isDestroyed()) {
+    const b = win.getBounds();
+    ax = b.x + b.width / 2;
+    ay = b.y + b.height / 2;
+  }
+  if (!Number.isFinite(ax) || !Number.isFinite(ay)) return guideMapState();
+  store.patch({ guide: { anchorX: Math.round(ax), anchorY: Math.round(ay) } });
+  broadcast();
+  pushMapState();
+  return guideMapState();
 }
 
 /** 收起成小球：窗口缩到 76×76，页面自己切圆形外观 */
 function guideSetBall(on) {
   // 收成球 = 大图窗隐藏、球留在屏幕上；展开 = 反过来。
+
   // 球的窗口由 OrbManager 管，大图窗不再缩成 76×76 —— 那种做法在
   // 多球场景下没法表达「我收的是哪一个」。
   if (on) return reconcile({ s: 'ball', v: 'hidden' });
@@ -1062,6 +1183,12 @@ function registerHotkeys() {
   } catch {
     /* 被别的软件占用就跳过，托盘菜单里还有同样的入口 */
   }
+  // v1.5.0：Alt+M 一键切「地图覆盖模式」，不进设置界面，玩家随手开合
+  try {
+    globalShortcut.register('Alt+M', () => guideSetMapMode(!store.get().guide.mapMode));
+  } catch {
+    /* 被占用就跳过，悬浮窗标题栏上也有按钮 */
+  }
   broadcast();
   return result;
 }
@@ -1452,6 +1579,11 @@ function setupIpc() {
   handle('guide:overview', () => guideLib.overview(store.get().guide.root));
 
   handle('guide:setWidth', (_e, w) => guideSetWidth(w));
+  // v1.5.0 地图覆盖模式
+  handle('guide:mapMode', (_e, on) => guideSetMapMode(!!on));
+  handle('guide:mapState', () => guideMapState());
+  handle('guide:scale', (_e, v) => guideSetScale(v));
+  handle('guide:anchor', (_e, p) => guideSetAnchor(p && p.x, p && p.y));
   handle('guide:setAlpha', (_e, a) => {
     const v = Math.max(0.2, Math.min(1, Number(a) || 1));
     store.patch({ guide: { alpha: v } });
@@ -1886,7 +2018,12 @@ function setupIpc() {
   ipcMain.on('guide:resizeEnd', () => {
     if (guideWindow && !guideWindow.isDestroyed()) {
       const b = guideWindow.getBounds();
-      store.patch({ guide: { x: b.x, y: b.y, w: b.width, h: b.height } });
+      try {
+        guideWindow.webContents.setZoomFactor(1);
+      } catch {
+        /* 忽略 */
+      }
+      store.patch({ guide: { x: b.x, y: b.y, w: b.width, h: b.height, scale: 1 } });
       broadcast();
     }
     resizeState = null;

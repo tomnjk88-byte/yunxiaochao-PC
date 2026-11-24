@@ -38,6 +38,13 @@ const DEFAULTS = {
     columns: 2,
     ball: false,
     lastCategory: '',
+    // v1.5.0：地图覆盖模式。小抄贴在地图上，半透明 + 智能穿透，
+    // 并支持以锚点为中心的等比缩放（Alt+Shift+滚轮）。
+    // 注意：这里只是「交互形态」，真正的自动跟随即需要标定，见 main.js。
+    mapMode: false,
+    scale: 1,
+    anchorX: null,
+    anchorY: null,
   },
   crosshair: {
     enabled: false,

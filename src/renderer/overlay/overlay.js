@@ -312,6 +312,8 @@ window.addEventListener('wheel', (e) => {
   if (!e.altKey && !e.ctrlKey) return;
   e.preventDefault();
   const step = e.deltaY < 0 ? 1 : -1;
+  // v1.5.0：Alt+Shift 组合优先，避免和「Alt=透明度」打架
+  if (e.altKey && e.shiftKey) { nudgeMapScale(step * 5); return; }
   if (e.altKey) nudgeAlpha(step * 0.05);
   else nudgeWidth(step * 40);
 }, { passive: false });
@@ -423,6 +425,65 @@ $('#alpha').addEventListener('input', (e) => {
   paintRange(e.target);
   yunx.guide.setAlpha(v / 100);
 });
+
+// ---------------------------------------------------------------------------
+// v1.5.0 地图覆盖模式
+// ---------------------------------------------------------------------------
+function paintMapState(st) {
+  if (!st) return;
+  if (cfg && cfg.guide) {
+    cfg.guide.mapMode = !!st.on;
+    cfg.guide.scale = Number(st.scale) || 1;
+  }
+  $('#btnMap').classList.toggle('on', !!st.on);
+  $('#dockScale').hidden = !st.on;
+  const v = Math.round((Number(st.scale) || 1) * 100);
+  if (document.activeElement !== $('#scale')) {
+    $('#scale').value = v;
+    $('#scaleVal').textContent = v + '%';
+    paintRange($('#scale'));
+  }
+}
+
+/** Alt+Shift+滚轮：以锚点为中心等比缩放，模拟「跟随地图缩放」 */
+function nudgeMapScale(delta) {
+  const cur = Math.round((Number(cfg && cfg.guide && cfg.guide.scale) || 1) * 100);
+  const next = Math.max(60, Math.min(160, cur + delta));
+  if (next === cur) return;
+  if (cfg && cfg.guide) cfg.guide.scale = next / 100;
+  yunx.guide.setScale(next / 100);
+  $('#scale').value = next;
+  $('#scaleVal').textContent = next + '%';
+  paintRange($('#scale'));
+  toast('小抄缩放 ' + next + '%', 900);
+}
+
+$('#btnMap').onclick = async () => {
+  const on = !(cfg && cfg.guide && cfg.guide.mapMode);
+  const st = await yunx.guide.mapMode(on);
+  paintMapState(st);
+  toast(on
+    ? '地图覆盖已开 · 半透明可点可穿 · Alt+Shift+滚轮缩放'
+    : '地图覆盖已关', on ? 3200 : 1600);
+};
+
+$('#scale').addEventListener('input', (e) => {
+  const v = Number(e.target.value);
+  $('#scaleVal').textContent = v + '%';
+  paintRange(e.target);
+});
+$('#scale').addEventListener('change', (e) => {
+  yunx.guide.setScale(Number(e.target.value) / 100);
+});
+
+// Alt+Shift+左键：把缩放锚点设在鼠标处
+window.addEventListener('mousedown', (e) => {
+  if (!e.altKey || !e.shiftKey) return;
+  e.preventDefault();
+  e.stopPropagation();
+  yunx.guide.setAnchor();
+  toast('锚点已设在鼠标位置', 1600);
+}, true);
 $('#width').addEventListener('input', (e) => {
   const v = Number(e.target.value);
   $('#widthVal').textContent = v;
@@ -441,6 +502,7 @@ yunx.guide.onBall((on) => {
 });
 
 yunx.guide.onReload(() => load(''));
+if (yunx.guide.onMapState) yunx.guide.onMapState((st) => paintMapState(st));
 
 // 主进程改了透明度/宽度（比如从主界面调），这里跟着走
 yunx.onState(({ cfg: next }) => {
@@ -461,6 +523,15 @@ yunx.onState(({ cfg: next }) => {
   else document.body.classList.remove('ball-mode');
   // 锁定状态在按钮上要有痕迹，否则用户不知道「点不动」是自己锁的
   if (!lockTimer) $('#btnLock').classList.toggle('on', !!next.guide.locked);
+  // v1.5.0：地图覆盖状态同步（Alt+M 冷启动、设置页切换都走这里）
+  $('#btnMap').classList.toggle('on', !!next.guide.mapMode);
+  $('#dockScale').hidden = !next.guide.mapMode;
+  const scv = Math.round((Number(next.guide.scale) || 1) * 100);
+  if (document.activeElement !== $('#scale')) {
+    $('#scale').value = scv;
+    $('#scaleVal').textContent = scv + '%';
+    paintRange($('#scale'));
+  }
 });
 
 // ---------------------------------------------------------------------------
