@@ -59,6 +59,8 @@ contextBridge.exposeInMainWorld('yunx', {
     setScale: (v) => invoke('guide:scale', v),
     setAnchor: (p) => invoke('guide:anchor', p),
     onMapState: (cb) => subscribe('guide:mapState', cb),
+    // v1.6.0：没有 PC 版游戏时的自测地图
+    openTestMap: () => invoke('guide:openTestMap'),
     onReload: (cb) => subscribe('guide:reload', cb),
     // 从悬浮球进来时，主进程告诉页面「直接打开这个目录的第一张图」
     onOpenAt: (cb) => subscribe('guide:openAt', cb),

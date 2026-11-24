@@ -1,7 +1,7 @@
 {
   "name": "yunx-guide-pc",
   "productName": "YunX Guide PC",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "云小抄 PC · 多悬浮球 / 悬浮攻略窗 / 网盘下载管理（1:1 目录 · 整文件夹下载 · 防重复）/ 多套准星",
   "main": "src/main/main.js",
   "author": "云小抄",

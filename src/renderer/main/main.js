@@ -1035,6 +1035,11 @@ function bindEvents() {
     }
     toast(v ? '地图覆盖已开：半透明 + 可点可穿，Alt+Shift+滚轮缩放' : '地图覆盖已关');
   };
+  // v1.6.0：测试地图。没有 PC 版游戏时用它验证覆盖 / 透明 / 穿透
+  $('#btnTestMap').onclick = async () => {
+    await yunx.guide.openTestMap();
+    toast('已打开测试地图：滚轮缩放、拖动平移、点击计数验证穿透');
+  };
   // v1.2.0：游戏模式。开了之后主进程每 800ms 把它顶回最上层
   $('#switchGuideTop').onclick = async () => {
     const v = !cfg.guide.forceTop;

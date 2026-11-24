@@ -158,6 +158,10 @@
                 <button class="switch" id="switchGuideMap" role="switch"></button>
               </div>
               <div class="switch-row">
+                <div><b>测试地图</b><span>不开游戏也能试：一张可缩放、可拖动的模拟地图，点击计数用来验证穿透</span></div>
+                <button class="btn sm" id="btnTestMap">打开</button>
+              </div>
+              <div class="switch-row">
                 <div><b>游戏模式 · 始终置顶</b><span>窗口一直压在游戏上面，不会被别的窗口盖住</span></div>
                 <button class="switch" id="switchGuideTop" role="switch"></button>
               </div>
@@ -521,7 +525,7 @@
             <img src="../../../assets/icon.png" alt="" class="about-icon" />
             <div>
               <h2>云小抄 <span>PC</span></h2>
-              <p id="aboutVersion">v1.5.0 · 功能对齐 Android v2.4.0</p>
+              <p id="aboutVersion">v1.6.0 · 功能对齐 Android v2.4.0</p>
               <p class="fine">悬浮攻略 · 多悬浮球 · 网盘管理（1:1 目录 / 整文件夹下载 / 防重复）· 多套准星 · 碎格 / 浮现</p>
             </div>
             <div class="about-badge">AGPL-3.0</div>
@@ -550,7 +554,24 @@
             <div class="changelog">
 
               <details class="cl-item" open>
-                <summary><b>v1.5.0</b><span>2026-11-24</span><i class="ok">当前版本</i></summary>
+                <summary><b>v1.6.0</b><span>2026-11-24</span><i class="ok">当前版本</i></summary>
+                <div class="cl-body">
+                  <h5 class="cl-new">新增</h5>
+                  <ul>
+                    <li>测试地图：设置页「窗口 → 测试地图 → 打开」，开一张可缩放、可拖动、可点击的模拟地图</li>
+                    <li>点击计数：小抄穿透生效时，点击测试地图会让计数 +1，用来验证「鼠标是否真的穿过去了」</li>
+                    <li>测试地图带缩放百分比，方便对比小抄的 Alt+Shift+滚轮 缩放是否跟得上</li>
+                  </ul>
+                  <h5 class="cl-opt">说明</h5>
+                  <ul>
+                    <li>测试地图只是本地模拟窗口，不注入、不读取任何游戏进程</li>
+                    <li>没有 PC 版游戏时，也可以完整验证覆盖 / 半透明 / 可点 / 可穿</li>
+                  </ul>
+                </div>
+              </details>
+
+              <details class="cl-item">
+                <summary><b>v1.5.0</b><span>2026-11-24</span></summary>
                 <div class="cl-body">
                   <h5 class="cl-new">新增</h5>
                   <ul>

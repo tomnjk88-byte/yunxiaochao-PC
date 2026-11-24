@@ -588,6 +588,55 @@ function guideSetBall(on) {
 }
 
 // ---------------------------------------------------------------------------
+// 测试地图（v1.6.0）
+// ---------------------------------------------------------------------------
+//
+// 玩家没有 PC 版《超自然行动组》，也需要一个能验证「覆盖 / 透明 / 可点 / 可穿」的地方。
+// 这里开一个普通窗口当「假游戏」：小抄始终置顶，正好复刻游戏地图界面的层级关系。
+// 测试地图自带缩放、拖动和点击计数 —— 穿透生效时，点击会让计数 +1。
+
+let testMapWindow = null;
+
+function openTestMap() {
+  if (testMapWindow && !testMapWindow.isDestroyed()) {
+    if (testMapWindow.isMinimized()) testMapWindow.restore();
+    testMapWindow.show();
+    testMapWindow.focus();
+    return true;
+  }
+  const wa = screen.getPrimaryDisplay().workArea;
+  const width = Math.min(980, wa.width - 80);
+  const height = Math.min(680, wa.height - 80);
+  testMapWindow = new BrowserWindow({
+    width,
+    height,
+    x: wa.x + Math.round((wa.width - width) / 2),
+    y: wa.y + Math.round((wa.height - height) / 2),
+    show: false,
+    frame: true,
+    backgroundColor: '#070b11',
+    title: '测试地图 · 云小抄自测用',
+    icon: path.join(__dirname, '..', '..', 'assets', 'icon.png'),
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: false,
+      spellcheck: false,
+    },
+  });
+  testMapWindow.setMenuBarVisibility(false);
+  testMapWindow.loadFile(pagePath('testmap/index.html'));
+  testMapWindow.once('ready-to-show', () => {
+    if (testMapWindow && !testMapWindow.isDestroyed()) testMapWindow.show();
+  });
+  testMapWindow.on('closed', () => {
+    testMapWindow = null;
+  });
+  return true;
+}
+
+
+// ---------------------------------------------------------------------------
 // 置顶看门狗（游戏模式）
 // ---------------------------------------------------------------------------
 //
@@ -1584,6 +1633,8 @@ function setupIpc() {
   handle('guide:mapState', () => guideMapState());
   handle('guide:scale', (_e, v) => guideSetScale(v));
   handle('guide:anchor', (_e, p) => guideSetAnchor(p && p.x, p && p.y));
+  // v1.6.0：没有 PC 版游戏时的自测地图
+  handle('guide:openTestMap', () => openTestMap());
   handle('guide:setAlpha', (_e, a) => {
     const v = Math.max(0.2, Math.min(1, Number(a) || 1));
     store.patch({ guide: { alpha: v } });
